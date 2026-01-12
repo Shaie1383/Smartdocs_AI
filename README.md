@@ -1,108 +1,269 @@
-# SmartDocs AI - Intelligent Document Processing System
+# SmartDocs AI: Intelligent File Understanding & Query Platform
 
 ## Project Overview
-SmartDocs AI is an intelligent document processing application that leverages AI and machine learning to extract, analyze, and manage documents efficiently. This is an internship project for learning and developing production-ready Python applications.
 
-## Features
-- 📄 PDF document processing and extraction
-- 🤖 AI-powered document analysis using OpenAI
-- 💾 Vector database integration with ChromaDB
-- 🔍 Semantic search capabilities using LangChain
-- 🎨 Interactive web interface with Streamlit
+SmartDocs AI is an intelligent Streamlit-based web application that enables users to upload, process, and interact with multiple PDF documents using AI-powered natural language processing (NLP) and Large Language Models (LLMs). By leveraging advanced text extraction, preprocessing, and vector-based search techniques, users can ask questions and receive instant, context-aware responses from their documents.
+
+### Key Features
+- **PDF Text Extraction**: Support for multiple extraction methods (PyMuPDF, pdfplumber)
+- **Intelligent Text Processing**: Automatic cleaning, normalization, and preprocessing
+- **Vector Embeddings**: Convert text into embeddings for semantic search
+- **AI-Powered Search**: Query documents using natural language
+- **Multi-Model Support**: Integration with Google Gemini Pro and Langchain
+- **Streamlit UI**: User-friendly interface for document interaction
+- **Vector Database**: Support for ChromaDB, Qdrant, and Pinecone
+
+---
 
 ## Project Structure
+
 ```
-Smartdocs_AI/
-├── backend/              # Backend logic and APIs
-├── frontend/             # Streamlit web application
-│   └── app.py           # Main application entry point
-├── uploads/             # User uploaded files
-├── data/                # Data storage and databases
-├── utils/               # Utility functions and helpers
-├── config/              # Configuration files
-├── requirements.txt     # Python dependencies
-├── .gitignore          # Git ignore rules
-└── README.md           # This file
+smartdocs_ai/
+│
+├── backend/                    # Core processing modules
+│   ├── __init__.py
+│   ├── pdf_processor.py       # PDF text extraction
+│   ├── text_cleaner.py        # Text preprocessing and cleaning
+│   └── vectorizer.py          # Text to embedding conversion (future)
+│
+├── frontend/                   # Streamlit web application
+│   └── app.py                 # Main Streamlit interface
+│
+├── tests/                      # Test modules
+│   ├── test_extraction.py     # PDF extraction tests
+│   └── test_cleaning.py       # Text cleaning tests
+│
+├── config/                     # Configuration files
+│   ├── __init__.py
+│   └── settings.py            # Application settings
+│
+├── data/                       # Data storage
+│   └── [sample PDFs will be stored here]
+│
+├── uploads/                    # User uploaded files
+│   └── [temporary storage for user uploads]
+│
+├── utils/                      # Utility functions
+│   └── [helper modules]
+│
+├── requirements.txt            # Python dependencies
+├── README.md                   # This file
+├── generate_sample_pdfs.py    # Script to generate test PDFs
+└── .gitignore                 # Git ignore rules
 ```
 
-## Prerequisites
-- Python 3.8 or higher
-- pip (Python package manager)
-- Git
+---
 
 ## Installation & Setup
 
-### Step 1: Clone or Initialize Repository
-```bash
-cd Smartdocs_AI
-git init
-```
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+- Virtual environment (recommended)
 
-### Step 2: Create Virtual Environment
+### Step 1: Create Virtual Environment
 ```bash
-# On Windows
 python -m venv venv
+
+# Activate virtual environment
+# On Windows:
 venv\Scripts\activate
 
-# On macOS/Linux
-python3 -m venv venv
+# On macOS/Linux:
 source venv/bin/activate
 ```
 
-### Step 3: Install Dependencies
+### Step 2: Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 4: Set Up Environment Variables
-Create a `.env` file in the root directory:
-```
-OPENAI_API_KEY=your_openai_api_key_here
+### Step 3: Generate Sample PDFs (Optional but Recommended)
+```bash
+python generate_sample_pdfs.py
 ```
 
-## Running the Application
+This creates 3 sample PDFs in the `data/` directory:
+- `sample_simple_text.pdf` - Basic text document
+- `sample_multicolumn.pdf` - Multi-column layout
+- `sample_complex_formatting.pdf` - Complex formatting with tables
 
-### Start the Streamlit App
+---
+
+## Usage
+
+### Running Tests
+
+#### Test 1: PDF Extraction Module
+```bash
+python tests/test_extraction.py
+```
+
+**What it tests:**
+- PDF text extraction using PyMuPDF
+- PDF text extraction using pdfplumber
+- Fallback extraction mechanism
+- PDF metadata extraction
+- Error handling for corrupted/protected PDFs
+
+#### Test 2: Text Cleaning Module
+```bash
+python tests/test_cleaning.py
+```
+
+**What it tests:**
+- Extra whitespace removal
+- Special character removal
+- Header/footer elimination
+- Text normalization
+- Complete cleaning pipeline
+- Edge cases (empty text, unicode, very long text)
+
+#### Run All Tests
+```bash
+pytest tests/ -v
+```
+
+### Using the Modules Directly
+
+#### PDF Extraction
+```python
+from backend.pdf_processor import PDFProcessor
+
+processor = PDFProcessor("path/to/document.pdf")
+result = processor.extract_all()
+print(result['text_by_page'])
+```
+
+#### Text Cleaning
+```python
+from backend.text_cleaner import TextCleaner
+
+cleaner = TextCleaner()
+cleaned_text = cleaner.clean_text("Your messy text here...")
+```
+
+### Running Streamlit App (Future)
 ```bash
 streamlit run frontend/app.py
 ```
 
-The application will open in your default browser at `http://localhost:8501`
+---
 
-## Development Guide
+## Module Documentation
 
-### Project Structure Details
-- **backend/**: Contains core business logic, API routes, and database operations
-- **frontend/**: Streamlit UI components and page definitions
-- **uploads/**: Temporary storage for user-uploaded documents (gitignored)
-- **data/**: Vector database and persistent data storage
-- **utils/**: Helper functions for PDF processing, text extraction, etc.
-- **config/**: Configuration variables and settings
+### Backend Modules
 
-### Adding Dependencies
-When adding new packages:
-1. Install the package: `pip install package_name`
-2. Update requirements.txt: `pip freeze > requirements.txt`
-3. Commit changes to git
+#### 1. `pdf_processor.py`
 
-### Common Commands
+**Class: PDFProcessor**
+
+Methods:
+- `extract_text_pymupdf()` - Extract text using PyMuPDF (fast, reliable)
+- `extract_text_pdfplumber()` - Extract text using pdfplumber (better for tables)
+- `get_pdf_metadata()` - Extract PDF metadata
+- `extract_with_fallback()` - Try PyMuPDF first, fallback to pdfplumber
+- `extract_all()` - Complete extraction with text and metadata
+
+#### 2. `text_cleaner.py`
+
+**Class: TextCleaner**
+
+Methods:
+- `remove_extra_whitespace(text)` - Normalize spaces and line breaks
+- `remove_special_characters(text)` - Remove unwanted symbols
+- `remove_headers_footers(text)` - Eliminate page numbers and headers
+- `normalize_text(text)` - Lowercase and Unicode normalization
+- `clean_text(text)` - Master method applying all cleaning steps
+
+---
+
+## Dependencies
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| streamlit | 1.28.1 | Web UI framework |
+| PyMuPDF | 1.23.8 | PDF text extraction |
+| pdfplumber | 0.10.3 | PDF processing (fallback) |
+| openai | 1.3.9 | OpenAI API integration |
+| python-dotenv | 1.0.0 | Environment variable management |
+| chromadb | 0.4.14 | Vector database |
+| langchain | 0.1.1 | LLM framework |
+| reportlab | 4.0.7 | PDF generation (testing) |
+| sentence-transformers | 2.2.2 | Embeddings generation |
+| faiss-cpu | 1.7.4 | Vector similarity search |
+| pytest | 7.4.3 | Testing framework |
+
+---
+
+## Task Completion Status
+
+### Task 1: Environment Setup & Project Initialization ✅
+- [x] Complete folder structure created
+- [x] Virtual environment setup documented
+- [x] requirements.txt with all dependencies
+- [x] Git repository initialized with .gitignore
+- [x] README.md with comprehensive instructions
+
+### Task 2: Basic PDF Text Extraction ✅
+- [x] PDFProcessor class implemented
+- [x] PyMuPDF and pdfplumber extraction
+- [x] Metadata extraction
+- [x] Error handling for corrupted/protected PDFs
+- [x] Comprehensive test suite
+
+### Task 3: Text Preprocessing & Cleaning ✅
+- [x] TextCleaner class with all functions
+- [x] Edge case handling
+- [x] Comprehensive test suite
+
+---
+
+## Quick Start
+
 ```bash
-# Activate virtual environment
-venv\Scripts\activate          # Windows
-source venv/bin/activate       # macOS/Linux
+# 1. Activate virtual environment
+venv\Scripts\activate
 
-# Deactivate virtual environment
-deactivate
+# 2. Generate sample PDFs
+python generate_sample_pdfs.py
 
-# Run tests
-pytest
+# 3. Run extraction tests
+python tests/test_extraction.py
 
-# Format code
-black .
-
-# Lint code
-flake8 .
+# 4. Run text cleaning tests
+python tests/test_cleaning.py
 ```
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+OPENAI_API_KEY=your_api_key_here
+DEBUG=False
+```
+
+---
+
+## Troubleshooting
+
+### Issue: "ModuleNotFoundError: No module named 'fitz'"
+```bash
+pip install PyMuPDF==1.23.8
+```
+
+### Issue: "reportlab not found"
+```bash
+pip install reportlab==4.0.7
+```
+
+### Issue: Tests fail with path errors
+Run from project root directory.
+
+---
 
 ## Technologies Used
 - **Streamlit**: Web application framework
@@ -113,62 +274,8 @@ flake8 .
 - **LangChain**: Framework for building AI applications
 - **Python-dotenv**: Environment variable management
 
-## API Keys & Configuration
-To use the full functionality:
-1. Get OpenAI API key from [OpenAI Platform](https://platform.openai.com/)
-2. Create `.env` file with your API key
-3. Never commit `.env` file (it's in .gitignore)
-
-## Git Workflow
-```bash
-# Check status
-git status
-
-# Add changes
-git add .
-
-# Commit changes
-git commit -m "Descriptive commit message"
-
-# Push to remote (when applicable)
-git push origin main
-```
-
-## Troubleshooting
-
-### Virtual Environment Issues
-- Ensure Python 3.8+ is installed: `python --version`
-- Try creating venv with full path: `python -m venv c:\path\to\Smartdocs_AI\venv`
-
-### Streamlit Issues
-- Clear Streamlit cache: `streamlit cache clear`
-- Restart the app if changes aren't reflected
-
-### Dependency Issues
-- Ensure virtual environment is activated
-- Reinstall dependencies: `pip install -r requirements.txt --force-reinstall`
-
-## Next Steps
-1. Implement backend PDF processing functions
-2. Add OpenAI integration for document analysis
-3. Set up ChromaDB for vector storage
-4. Build additional Streamlit pages
-5. Implement authentication (if needed)
-
-## Contributing
-Follow these guidelines when contributing:
-- Create feature branches for new features
-- Write clear commit messages
-- Update documentation as needed
-- Test code before committing
-
-## License
-This project is created for educational purposes during internship.
-
-## Support
-For issues or questions, please refer to the documentation or contact the project maintainer.
-
 ---
 
-**Last Updated**: January 5, 2026
+**Last Updated**: January 7, 2026
+**Status**: Tasks 1-3 Complete ✅
 **Version**: 1.0.0
